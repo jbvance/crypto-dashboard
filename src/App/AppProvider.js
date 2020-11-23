@@ -1,11 +1,21 @@
-import React, { createContext, useState } from 'react';
+import React, { useEffect, createContext, useState } from 'react';
+const cc = require('cryptocompare');
 
 const AppContext = createContext();
 const { Provider } = AppContext;
 
 const AppProvider = ({ children }) => {
+  useEffect(() => {
+    const fetchCoins = async () => {
+      let data = await cc.coinList();
+     setCoinList(data.Data);     
+    }
+
+    fetchCoins();
+  }, [])
   const [page, setPage] = useState('dashboard');
   const [firstVisit, setFirstVisit] = useState(false);
+  const [coinList, setCoinList] = useState(null);
 
   const savedSettings = () => {   
     let cryptoData = JSON.parse(localStorage.getItem('cryptoData'));   
@@ -29,6 +39,7 @@ const AppProvider = ({ children }) => {
         firstVisit,
         savedSettings,
         confirmFavorites,
+        coinList
       }}
     >
       {children}
