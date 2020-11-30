@@ -22,6 +22,7 @@ const AppProvider = ({ children }) => {
   const [firstVisit, setFirstVisit] = useState(true);
   const [coinList, setCoinList] = useState(null);
   const [favorites, setFavorites] = useState(['BTC', 'ETH', 'XMR', 'DOGE']);
+  const [filteredCoins, setFilteredCoins] = useState(null);
 
   const savedSettings = () => {
     let cryptoData = JSON.parse(localStorage.getItem('cryptoData'));
@@ -53,7 +54,7 @@ const AppProvider = ({ children }) => {
 
   const isInFavorites = (key) => {   
     return favorites.indexOf(key) > 0;
-  };
+  };  
 
   return (
     <Provider
@@ -68,6 +69,8 @@ const AppProvider = ({ children }) => {
         addCoin,
         removeCoin,
         isInFavorites,
+        filteredCoins,
+        setFilteredCoins
       }}
     >
       {children}

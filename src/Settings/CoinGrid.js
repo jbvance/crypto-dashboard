@@ -10,19 +10,32 @@ export const CoinGridStyled = styled.div`
   margin-top: 40px;
 `;
 
-const getCoinsToDisplay = (coinList, topSection, favorites) => {
-  console.log(coinList, favorites, topSection);
-  return topSection ? favorites : Object.keys(coinList).slice(0, topSection ? 10 : 100);
-}
+const getLowerSectionCoins = (coinList,filteredCoins) => {
+  console.log(coinList, filteredCoins);
+  if(filteredCoins) {
+    console.log('YESSSS', filteredCoins);
+  }
+  return (
+    (filteredCoins && Object.keys(filteredCoins)) ||
+    Object.keys(coinList).slice(0, 100)
+  );
+};
+
+const getCoinsToDisplay = (coinList, topSection, favorites, filteredCoins) => {
+  console.log('GOT HERE', topSection)
+  return topSection ? favorites : getLowerSectionCoins(coinList, filteredCoins);
+};
 
 const CoinGrid = ({ topSection }) => {
   const appContext = useContext(AppContext);
-  const {coinList, favorites } = appContext; 
+  const { coinList, favorites, filteredCoins } = appContext;
   return (
     <CoinGridStyled>
-      {getCoinsToDisplay(coinList, topSection, favorites).map((coinKey) => (
-        <CoinTile key={coinKey} topSection={topSection} coinKey={coinKey} />
-      ))}
+      {getCoinsToDisplay(coinList, topSection, favorites, filteredCoins).map(
+        (coinKey) => (
+          <CoinTile key={coinKey} topSection={topSection} coinKey={coinKey} />
+        )
+      )}
     </CoinGridStyled>
   );
 };
