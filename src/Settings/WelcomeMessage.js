@@ -1,10 +1,10 @@
+import { first } from 'lodash';
 import React, { useContext } from 'react';
 import { AppContext } from '../App/AppProvider';
 
 const WelcomeMessage = () => {
   const appContext = useContext(AppContext);
-  const { firstVisit, savedSettings } = appContext;
-  savedSettings();
+  const { firstVisit } = appContext;   
   if (!firstVisit) {
     return null;
   }

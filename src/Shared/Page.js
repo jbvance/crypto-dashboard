@@ -2,9 +2,9 @@ import React, { useContext } from 'react';
 import { AppContext } from '../App/AppProvider';
 
 const Page = ({ name, children }) => {
-  const appContext = useContext(AppContext);
+  const appContext = useContext(AppContext); 
   if (appContext.page !== name) {
-    return null;
+    return <div>HERE</div>;
   }
   return <div>{children}</div>;
 };
