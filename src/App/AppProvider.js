@@ -12,7 +12,7 @@ const AppProvider = ({ children }) => {
   const [page, setPage] = useState('dashboard');
   const [firstVisit, setFirstVisit] = useState(true);
   const [coinList, setCoinList] = useState(null);
-  const [favorites, setFavorites] = useState([]); //useState(['BTC', 'ETH', 'XMR', 'DOGE']);
+  const [favorites, setFavorites] = useState(['BTC', 'ETH', 'XMR', 'DOGE']);
   const [filteredCoins, setFilteredCoins] = useState(null);
   const [prices, setPrices] = useState(null);
   const [loadingPrices, setLoadingPrices] = useState(false);

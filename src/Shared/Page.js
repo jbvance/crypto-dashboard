@@ -4,7 +4,7 @@ import { AppContext } from '../App/AppProvider';
 const Page = ({ name, children }) => {
   const appContext = useContext(AppContext); 
   if (appContext.page !== name) {
-    return <div>HERE</div>;
+    return <div></div>;
   }
   return <div>{children}</div>;
 };
