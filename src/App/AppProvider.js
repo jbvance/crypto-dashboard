@@ -16,6 +16,7 @@ const AppProvider = ({ children }) => {
   const [filteredCoins, setFilteredCoins] = useState(null);
   const [prices, setPrices] = useState(null);
   const [loadingPrices, setLoadingPrices] = useState(false);
+  const [currentFavorite, setCurrentFavorite] = useState(null);
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -26,9 +27,20 @@ const AppProvider = ({ children }) => {
     fetchCoins();
   }, []);
 
-  useEffect(() => {  
-    fetchPrices();    
+  useEffect(() => {
+    fetchPrices();
   }, [firstVisit]);
+
+  const setNewCurrentFavorite = (sym) => {
+    setCurrentFavorite(sym);
+    localStorage.setItem(
+      'cryptoData',
+      JSON.stringify({
+        ...JSON.parse(localStorage.getItem('cryptoData')),
+        currentFavorite: sym,
+      })
+    );
+  };
 
   const savedSettings = () => {
     let cryptoData = JSON.parse(localStorage.getItem('cryptoData'));
@@ -39,14 +51,20 @@ const AppProvider = ({ children }) => {
     } else {
       setFirstVisit(false);
       setFavorites(cryptoData.favorites);
+      setCurrentFavorite(cryptoData.currentFavorite);
     }
   };
 
   const confirmFavorites = () => {
+    const curFav = favorites[0];
     setFirstVisit(false);
+    setCurrentFavorite(curFav);
     setPage('dashboard');
     fetchPrices();
-    localStorage.setItem('cryptoData', JSON.stringify({ favorites }));
+    localStorage.setItem(
+      'cryptoData',
+      JSON.stringify({ favorites, currentFavorite: curFav })
+    );
   };
 
   const fetchPrices = async () => {
@@ -110,6 +128,8 @@ const AppProvider = ({ children }) => {
         setFilteredCoins,
         prices,
         loadingPrices,
+        currentFavorite,
+        setNewCurrentFavorite,
       }}
     >
       {children}
