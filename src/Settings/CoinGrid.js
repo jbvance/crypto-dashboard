@@ -11,10 +11,6 @@ export const CoinGridStyled = styled.div`
 `;
 
 const getLowerSectionCoins = (coinList,filteredCoins) => {
-  console.log(coinList, filteredCoins);
-  if(filteredCoins) {
-    console.log('YESSSS', filteredCoins);
-  }
   return (
     (filteredCoins && Object.keys(filteredCoins)) ||
     Object.keys(coinList).slice(0, 100)
@@ -22,7 +18,6 @@ const getLowerSectionCoins = (coinList,filteredCoins) => {
 };
 
 const getCoinsToDisplay = (coinList, topSection, favorites, filteredCoins) => {
-  console.log('GOT HERE', topSection)
   return topSection ? favorites : getLowerSectionCoins(coinList, filteredCoins);
 };
 

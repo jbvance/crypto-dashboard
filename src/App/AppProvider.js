@@ -9,27 +9,35 @@ const { Provider } = AppContext;
 const MAX_FAVORITES = 10;
 
 const AppProvider = ({ children }) => {
-  useEffect(() => {
-    const fetchCoins = async () => {
-      let data = await cc.coinList();
-      setCoinList(data.Data);   
-      savedSettings();        
-    };
-
-    fetchCoins();    
-  }, []);
   const [page, setPage] = useState('dashboard');
   const [firstVisit, setFirstVisit] = useState(true);
   const [coinList, setCoinList] = useState(null);
-  const [favorites, setFavorites] = useState(['BTC', 'ETH', 'XMR', 'DOGE']);
+  const [favorites, setFavorites] = useState([]); //useState(['BTC', 'ETH', 'XMR', 'DOGE']);
   const [filteredCoins, setFilteredCoins] = useState(null);
+  const [prices, setPrices] = useState(null);
+  const [loadingPrices, setLoadingPrices] = useState(false);
+
+  useEffect(() => {
+    const fetchCoins = async () => {
+      let data = await cc.coinList();
+      setCoinList(data.Data);
+      savedSettings();
+    };
+    fetchCoins();
+  }, []);
+
+  useEffect(() => {  
+    fetchPrices();    
+  }, [firstVisit]);
 
   const savedSettings = () => {
     let cryptoData = JSON.parse(localStorage.getItem('cryptoData'));
+    console.log('CD', cryptoData);
     if (!cryptoData) {
       setPage('settings');
       setFirstVisit(true);
     } else {
+      setFirstVisit(false);
       setFavorites(cryptoData.favorites);
     }
   };
@@ -37,7 +45,36 @@ const AppProvider = ({ children }) => {
   const confirmFavorites = () => {
     setFirstVisit(false);
     setPage('dashboard');
-    localStorage.setItem('cryptoData', JSON.stringify({ favorites}));
+    fetchPrices();
+    localStorage.setItem('cryptoData', JSON.stringify({ favorites }));
+  };
+
+  const fetchPrices = async () => {
+    setLoadingPrices(true);
+    console.log('FETCHING PRICES');
+    if (firstVisit) {
+      return;
+    }
+    let filteredPrices = await getPrices();
+    console.log(filteredPrices);
+    filteredPrices = filteredPrices.filter(
+      (price) => Object.keys(price).length
+    );
+    setPrices(filteredPrices);
+    setLoadingPrices(false);
+  };
+
+  const getPrices = async () => {
+    let returnData = [];
+    for (let i = 0; i < favorites.length; i++) {
+      try {
+        let priceData = await cc.priceFull(favorites[i], 'USD');
+        returnData.push(priceData);
+      } catch (e) {
+        console.warn('Fetch price error', e);
+      }
+    }
+    return returnData;
   };
 
   const addCoin = (key) => {
@@ -52,9 +89,9 @@ const AppProvider = ({ children }) => {
     setFavorites(favorites.filter((fav) => fav !== key));
   };
 
-  const isInFavorites = (key) => {   
+  const isInFavorites = (key) => {
     return favorites.indexOf(key) > 0;
-  };  
+  };
 
   return (
     <Provider
@@ -70,7 +107,9 @@ const AppProvider = ({ children }) => {
         removeCoin,
         isInFavorites,
         filteredCoins,
-        setFilteredCoins
+        setFilteredCoins,
+        prices,
+        loadingPrices,
       }}
     >
       {children}
