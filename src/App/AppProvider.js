@@ -20,6 +20,7 @@ const AppProvider = ({ children }) => {
   const [loadingPrices, setLoadingPrices] = useState(false);
   const [currentFavorite, setCurrentFavorite] = useState(null);
   const [historical, setHistorical] = useState(null);
+  const [timeInterval, setTimeInterval] = useState('months');
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -40,6 +41,11 @@ const AppProvider = ({ children }) => {
     fetchHistorical();
   }, [currentFavorite]);
 
+  useEffect(() => {
+    setHistorical(null);
+    fetchHistorical();
+  }, [timeInterval])
+
   const fetchHistorical = async () => {
     let results = await historicalPromises();
     console.log(results);
@@ -48,7 +54,7 @@ const AppProvider = ({ children }) => {
         name: currentFavorite,
         data: results.map((ticker, index) => [
           moment()
-            .subtract({ months: TIME_UNITS - index })
+            .subtract({ [timeInterval]: TIME_UNITS - index })
             .valueOf(),
           ticker.USD,
         ]),
@@ -64,7 +70,7 @@ const AppProvider = ({ children }) => {
         cc.priceHistorical(
           currentFavorite,
           ['USD'],
-          moment().subtract({ months: units }).toDate()
+          moment().subtract({ [timeInterval]: units }).toDate()
         )
       );
     }
@@ -150,6 +156,10 @@ const AppProvider = ({ children }) => {
     return favorites.indexOf(key) > 0;
   };
 
+  const changeChartSelect = value => {    
+    setTimeInterval(value);    
+  }
+
   return (
     <Provider
       value={{
@@ -169,7 +179,8 @@ const AppProvider = ({ children }) => {
         loadingPrices,
         currentFavorite,
         setNewCurrentFavorite,
-        historical
+        historical,
+        changeChartSelect
       }}
     >
       {children}
