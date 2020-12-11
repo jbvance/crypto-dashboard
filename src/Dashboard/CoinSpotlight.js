@@ -1,3 +1,4 @@
+import { constituentExchangeList } from 'cryptocompare';
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { AppContext } from '../App/AppProvider';
@@ -10,10 +11,10 @@ const SpotlightName = styled.h2`
 
 const CoinSpotlight = () => {
   const appContext = useContext(AppContext);
-  const { currentFavorite, coinList } = appContext;
+  const { currentFavorite, coinList } = appContext; 
   return (
     <Tile>
-      <SpotlightName> {coinList[currentFavorite].CoinName}</SpotlightName>
+      <SpotlightName> {coinList[currentFavorite] && coinList[currentFavorite].CoinName}</SpotlightName>
       <CoinImage spotlight coin={coinList[currentFavorite]} />
     </Tile>
   );

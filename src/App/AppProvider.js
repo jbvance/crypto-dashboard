@@ -1,4 +1,5 @@
 import React, { useEffect, createContext, useState } from 'react';
+import moment from 'moment';
 const cc = require('cryptocompare');
 cc.setApiKey(
   '5447ab40698e10665fd0d06a37557e8f689ca612b85638fdda41450924a65469'
@@ -7,6 +8,7 @@ cc.setApiKey(
 const AppContext = createContext();
 const { Provider } = AppContext;
 const MAX_FAVORITES = 10;
+const TIME_UNITS = 10;
 
 const AppProvider = ({ children }) => {
   const [page, setPage] = useState('dashboard');
@@ -17,6 +19,7 @@ const AppProvider = ({ children }) => {
   const [prices, setPrices] = useState(null);
   const [loadingPrices, setLoadingPrices] = useState(false);
   const [currentFavorite, setCurrentFavorite] = useState(null);
+  const [historical, setHistorical] = useState(null);
 
   useEffect(() => {
     const fetchCoins = async () => {
@@ -31,7 +34,45 @@ const AppProvider = ({ children }) => {
     fetchPrices();
   }, [firstVisit]);
 
+  useEffect(() => {
+    console.log('CHANGED', currentFavorite)
+    if (!currentFavorite) return;
+    fetchHistorical();
+  }, [currentFavorite]);
+
+  const fetchHistorical = async () => {
+    let results = await historicalPromises();
+    console.log(results);
+    let histData = [
+      {
+        name: currentFavorite,
+        data: results.map((ticker, index) => [
+          moment()
+            .subtract({ months: TIME_UNITS - index })
+            .valueOf(),
+          ticker.USD,
+        ]),
+      },
+    ];
+    setHistorical(histData);
+  };
+
+  const historicalPromises = () => {
+    let promises = [];
+    for (let units = TIME_UNITS; units > 0; units--) {
+      promises.push(
+        cc.priceHistorical(
+          currentFavorite,
+          ['USD'],
+          moment().subtract({ months: units }).toDate()
+        )
+      );
+    }
+    return Promise.all(promises);
+  };
+
   const setNewCurrentFavorite = (sym) => {
+    setHistorical(null);
     setCurrentFavorite(sym);
     localStorage.setItem(
       'cryptoData',
@@ -44,7 +85,6 @@ const AppProvider = ({ children }) => {
 
   const savedSettings = () => {
     let cryptoData = JSON.parse(localStorage.getItem('cryptoData'));
-    console.log('CD', cryptoData);
     if (!cryptoData) {
       setPage('settings');
       setFirstVisit(true);
@@ -61,6 +101,7 @@ const AppProvider = ({ children }) => {
     setCurrentFavorite(curFav);
     setPage('dashboard');
     fetchPrices();
+    fetchHistorical();
     localStorage.setItem(
       'cryptoData',
       JSON.stringify({ favorites, currentFavorite: curFav })
@@ -69,12 +110,10 @@ const AppProvider = ({ children }) => {
 
   const fetchPrices = async () => {
     setLoadingPrices(true);
-    console.log('FETCHING PRICES');
-    if (firstVisit) {
-      return;
-    }
+    // if (firstVisit) {
+    //   return;
+    // }
     let filteredPrices = await getPrices();
-    console.log(filteredPrices);
     filteredPrices = filteredPrices.filter(
       (price) => Object.keys(price).length
     );
@@ -130,6 +169,7 @@ const AppProvider = ({ children }) => {
         loadingPrices,
         currentFavorite,
         setNewCurrentFavorite,
+        historical
       }}
     >
       {children}

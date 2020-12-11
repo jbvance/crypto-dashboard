@@ -4,7 +4,6 @@ import { AppContext } from '../App/AppProvider';
 const Content = ({ children }) => {  
   const appContext = useContext(AppContext);
   const { coinList, prices, firstVisit, loadingPrices } = appContext;
-  console.log(firstVisit, prices)
   if (!coinList) {
     return <div>Loading Coins...</div>;
   }
