@@ -35,8 +35,7 @@ const AppProvider = ({ children }) => {
     fetchPrices();
   }, [firstVisit]);
 
-  useEffect(() => {
-    console.log('CHANGED', currentFavorite)
+  useEffect(() => {   
     if (!currentFavorite) return;
     fetchHistorical();
   }, [currentFavorite]);
@@ -47,8 +46,7 @@ const AppProvider = ({ children }) => {
   }, [timeInterval])
 
   const fetchHistorical = async () => {
-    let results = await historicalPromises();
-    console.log(results);
+    let results = await historicalPromises();   
     let histData = [
       {
         name: currentFavorite,
