@@ -25,9 +25,9 @@ const AppProvider = ({ children }) => {
   useEffect(() => {
     const fetchCoins = async () => {
       let data = await cc.coinList();
-      setCoinList(data.Data);
-      savedSettings();
+      setCoinList(data.Data);      
     };
+    savedSettings();
     fetchCoins();
   }, []);
 
@@ -114,9 +114,6 @@ const AppProvider = ({ children }) => {
 
   const fetchPrices = async () => {
     setLoadingPrices(true);
-    // if (firstVisit) {
-    //   return;
-    // }
     let filteredPrices = await getPrices();
     filteredPrices = filteredPrices.filter(
       (price) => Object.keys(price).length

@@ -6,7 +6,7 @@ const Content = ({ children }) => {
   const { coinList, prices, firstVisit, loadingPrices } = appContext;
   if (!coinList) {
     return <div>Loading Coins...</div>;
-  }
+  } 
   if ((!firstVisit && !prices) || loadingPrices) {
     return <div>Loading Prices</div>
   }
